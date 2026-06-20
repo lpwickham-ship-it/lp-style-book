@@ -12,6 +12,7 @@ export default async function HomePage() {
     { data: heroImages },
     { data: allItems },
     { count: itemCount },
+    { data: rawRecommendationItems },
   ] = await Promise.all([
     supabase.from('hero_images').select('*').order('display_order'),
     supabase
@@ -20,9 +21,22 @@ export default async function HomePage() {
       .eq('in_collection', true)
       .eq('status', 'owned'),
     supabase.from('items').select('*', { count: 'exact', head: true }).eq('in_collection', true).eq('status', 'owned'),
+    supabase
+      .from('items')
+      .select('*, brand:brands(*), subcategory:subcategories(*, category:categories(*)), photos:item_photos(*), reviews:lp_reviews(*), wear_records:wear_records(id)')
+      .eq('is_recommendation', true)
+      .eq('status', 'owned')
+      .order('created_at', { ascending: false })
+      .limit(3),
   ])
 
   const items = (allItems ?? []).map(item => ({
+    ...item,
+    lp_score: getItemLPScore((item.reviews as LPReview[]) ?? []),
+    wear_count: (item.wear_records as { id: string }[])?.length ?? 0,
+  }))
+
+  const recommendationItems = (rawRecommendationItems ?? []).map(item => ({
     ...item,
     lp_score: getItemLPScore((item.reviews as LPReview[]) ?? []),
     wear_count: (item.wear_records as { id: string }[])?.length ?? 0,
@@ -61,9 +75,26 @@ export default async function HomePage() {
 
         {recentItems.length > 0 && (
           <div className="mt-12">
-            <h2 className="font-serif text-2xl text-espresso mb-6">Recently Added</h2>
+            <div className="flex items-baseline justify-between mb-6">
+              <h2 className="font-serif text-2xl text-espresso">Recently Added</h2>
+              <a href="/collection" className="text-warm text-sm tracking-wide hover:text-tan transition-colors">View all →</a>
+            </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-8">
               {recentItems.map(item => (
+                <ItemCard key={item.id} item={item} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {recommendationItems.length > 0 && (
+          <div className="mt-12">
+            <div className="flex items-baseline justify-between mb-6">
+              <h2 className="font-serif text-2xl text-espresso">LP&apos;s Picks</h2>
+              <a href="/recommendations" className="text-warm text-sm tracking-wide hover:text-tan transition-colors">View all →</a>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-8">
+              {recommendationItems.map(item => (
                 <ItemCard key={item.id} item={item} />
               ))}
             </div>
