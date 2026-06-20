@@ -24,11 +24,9 @@ export default function ItemCard({ item }: { item: ItemWithRelations }) {
             <span className="text-warm/40 text-xs tracking-widest uppercase">No photo</span>
           </div>
         )}
-        {item.lp_score !== null && (
-          <div className="absolute top-3 right-3 bg-espresso text-cream text-xs px-2 py-1 tracking-wide">
-            {item.lp_score}
-          </div>
-        )}
+        <div className="absolute top-3 right-3 bg-espresso text-cream text-xs px-2 py-1 tracking-wide">
+          {item.lp_score ?? '–'}
+        </div>
       </div>
       <div>
         <p className="text-espresso text-sm font-medium leading-snug">{item.name}</p>
