@@ -10,7 +10,7 @@ export default async function AdminPage() {
   return (
     <div className="max-w-4xl mx-auto px-6 py-10">
       <h1 className="font-serif text-3xl text-espresso mb-2">Admin</h1>
-      <p className="text-warm text-sm mb-8">Logged in as {user.email}</p>
+      <p className="text-warm text-sm mb-8">Logged in as {user.email ?? 'unknown'}</p>
       <p className="text-warm text-sm">
         Product import and item management arrive in Plan 2.
       </p>
