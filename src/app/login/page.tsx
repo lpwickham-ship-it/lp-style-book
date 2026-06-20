@@ -6,18 +6,24 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setLoading(true)
+    setError(null)
     const supabase = createClient()
-    await supabase.auth.signInWithOtp({
+    const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
         emailRedirectTo: `${window.location.origin}/api/auth/callback`,
       },
     })
-    setSent(true)
+    if (error) {
+      setError(error.message)
+    } else {
+      setSent(true)
+    }
     setLoading(false)
   }
 
@@ -44,6 +50,9 @@ export default function LoginPage() {
               required
               className="w-full border border-warm/30 bg-white px-4 py-3 text-espresso text-sm focus:outline-none focus:border-tan placeholder:text-warm/40 transition-colors"
             />
+            {error && (
+              <p className="text-red-600 text-xs">{error}</p>
+            )}
             <button
               type="submit"
               disabled={loading}

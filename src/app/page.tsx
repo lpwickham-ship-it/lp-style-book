@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import HeroCarousel from '@/components/HeroCarousel'
 import DashboardStats from '@/components/DashboardStats'
@@ -77,7 +78,7 @@ export default async function HomePage() {
           <div className="mt-12">
             <div className="flex items-baseline justify-between mb-6">
               <h2 className="font-serif text-2xl text-espresso">Recently Added</h2>
-              <a href="/collection" className="text-warm text-sm tracking-wide hover:text-tan transition-colors">View all →</a>
+              <Link href="/collection" className="text-warm text-sm tracking-wide hover:text-tan transition-colors">View all →</Link>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-x-4 gap-y-8">
               {recentItems.map(item => (
@@ -91,7 +92,7 @@ export default async function HomePage() {
           <div className="mt-12">
             <div className="flex items-baseline justify-between mb-6">
               <h2 className="font-serif text-2xl text-espresso">LP&apos;s Picks</h2>
-              <a href="/recommendations" className="text-warm text-sm tracking-wide hover:text-tan transition-colors">View all →</a>
+              <Link href="/recommendations" className="text-warm text-sm tracking-wide hover:text-tan transition-colors">View all →</Link>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-8">
               {recommendationItems.map(item => (

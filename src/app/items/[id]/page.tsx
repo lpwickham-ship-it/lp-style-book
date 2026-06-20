@@ -34,7 +34,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
   const reviews = (item.reviews as LPReview[]) ?? []
   const wearRecords = (item.wear_records as WearRecord[]) ?? []
   const lpScore = getItemLPScore(reviews)
-  const latestReview = reviews.sort(
+  const latestReview = [...reviews].sort(
     (a, b) => new Date(b.reviewed_at).getTime() - new Date(a.reviewed_at).getTime()
   )[0]
 
@@ -98,7 +98,7 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
               <p className="text-xs text-warm mt-1">
                 Last worn:{' '}
                 {new Date(
-                  wearRecords.sort(
+                  [...wearRecords].sort(
                     (a, b) => new Date(b.worn_on).getTime() - new Date(a.worn_on).getTime()
                   )[0].worn_on
                 ).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}

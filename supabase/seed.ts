@@ -33,13 +33,13 @@ const BRANDS = [
 const ITEMS = [
   // Drake's
   { brand: "Drake's", name: 'Navy Grenadine Tie', sub: 'Ties', price: 145, mat: 'Silk grenadine', desc: 'The essential navy tie. Open-weave grenadine catches the light without being flashy. Pairs with everything.', wears: 22, fit: 9, comfort: 9, quality: 10, vers: 9, val: 8, failed: false },
-  { brand: "Drake's", name: 'Wool Challis Pocket Square', sub: 'Accessories', price: 65, mat: 'Wool challis', desc: 'Burgundy and navy paisley. Soft enough to fold without creasing, drapes beautifully in a chest pocket.', wears: 18, fit: 10, comfort: 10, quality: 10, vers: 7, val: 7, failed: false },
+  { brand: "Drake's", name: 'Wool Challis Pocket Square', sub: 'Scarves', price: 65, mat: 'Wool challis', desc: 'Burgundy and navy paisley. Soft enough to fold without creasing, drapes beautifully in a chest pocket.', wears: 18, fit: 10, comfort: 10, quality: 10, vers: 7, val: 7, failed: false },
   // Buck Mason
   { brand: 'Buck Mason', name: 'Slub Cotton Tee', sub: 'Tops', price: 58, mat: '100% slub cotton', desc: 'The best casual tee at this price. The texture is subtle and improves with washing.', wears: 41, fit: 8, comfort: 10, quality: 8, vers: 9, val: 9, failed: false },
   { brand: 'Buck Mason', name: 'Stretch Chino', sub: 'Bottoms', price: 118, mat: 'Cotton-stretch blend', desc: 'Comfortable enough for a long day but looks smart. The stretch is barely noticeable to anyone but you.', wears: 28, fit: 7, comfort: 9, quality: 7, vers: 8, val: 8, failed: false },
   // Sunspel
   { brand: 'Sunspel', name: 'Riviera Polo Shirt', sub: 'Tops', price: 165, mat: 'Long-staple cotton', desc: 'The polo shirt by which all others are judged. Minimal branding, perfect weight, flattering fit.', wears: 19, fit: 9, comfort: 10, quality: 10, vers: 8, val: 7, failed: false },
-  { brand: 'Sunspel', name: 'Classic Boxer Short', sub: 'Accessories', price: 55, mat: 'Long-staple cotton', desc: 'Expensive for underwear and worth every cent. Last significantly longer than cheaper alternatives.', wears: 60, fit: 9, comfort: 10, quality: 10, vers: 10, val: 8, failed: false },
+  { brand: 'Sunspel', name: 'Classic Boxer Short', sub: 'Bottoms', price: 55, mat: 'Long-staple cotton', desc: 'Expensive for underwear and worth every cent. Last significantly longer than cheaper alternatives.', wears: 60, fit: 9, comfort: 10, quality: 10, vers: 10, val: 8, failed: false },
   // Loro Piana
   { brand: 'Loro Piana', name: 'Cashmere Crewneck Sweater', sub: 'Knitwear', price: 1200, mat: 'Baby cashmere', desc: 'Softer than anything else I own. An investment that pays off every winter.', wears: 14, fit: 9, comfort: 10, quality: 10, vers: 9, val: 7, failed: false },
   { brand: 'Loro Piana', name: 'Wish Scarf', sub: 'Scarves', price: 450, mat: 'Baby cashmere', desc: 'Impossibly light for how warm it keeps you. One of the best purchases I\'ve made.', wears: 12, fit: 10, comfort: 10, quality: 10, vers: 8, val: 7, failed: false },
@@ -71,7 +71,7 @@ const ITEMS = [
   { brand: 'Turnbull & Asser', name: 'Jermyn Street Dress Shirt', sub: 'Shirts', price: 295, mat: '2-ply Sea Island cotton', desc: 'The finest cotton I\'ve worn against skin. The shirt equivalent of a Loro Piana sweater.', wears: 8, fit: 9, comfort: 10, quality: 10, vers: 7, val: 7, failed: false },
   { brand: 'Turnbull & Asser', name: 'Repp Stripe Tie', sub: 'Ties', price: 165, mat: 'Silk', desc: 'Navy and gold repp stripe. A Jermyn Street classic. Goes with everything in the wardrobe.', wears: 11, fit: 9, comfort: 9, quality: 10, vers: 8, val: 7, failed: false },
   // New & Lingwood
-  { brand: 'New & Lingwood', name: 'Merino Ankle Socks', sub: 'Accessories', price: 28, mat: 'Merino wool', desc: 'Exceptional socks. Lasted three years without holes or thinning. Worth the premium.', wears: 90, fit: 9, comfort: 10, quality: 10, vers: 10, val: 9, failed: false },
+  { brand: 'New & Lingwood', name: 'Merino Ankle Socks', sub: 'Bottoms', price: 28, mat: 'Merino wool', desc: 'Exceptional socks. Lasted three years without holes or thinning. Worth the premium.', wears: 90, fit: 9, comfort: 10, quality: 10, vers: 10, val: 9, failed: false },
   // Uniqlo
   { brand: 'Uniqlo', name: 'Premium Linen Shirt', sub: 'Shirts', price: 49, mat: 'French linen', desc: 'The best value linen shirt available. The fabric is good and it washes well.', wears: 22, fit: 7, comfort: 9, quality: 7, vers: 8, val: 10, failed: false },
   { brand: 'Uniqlo', name: 'Extra Fine Merino Crewneck', sub: 'Knitwear', price: 49, mat: 'Extra fine merino', desc: 'Impressive for the price. Pilled slightly after a year but remained wearable. Good value.', wears: 30, fit: 7, comfort: 8, quality: 6, vers: 9, val: 9, failed: false },
