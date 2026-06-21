@@ -63,7 +63,8 @@ export default async function CollectionPage({ searchParams }: PageProps) {
   ) as ItemWithRelations[]
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-10 flex gap-10">
+    <div className="max-w-6xl mx-auto px-6 py-10 flex gap-10 items-start">
+      <div className="sticky top-6 self-start overflow-y-auto max-h-[calc(100vh-3rem)] shrink-0">
       <CategorySidebar
         categories={(categories as (Category & { subcategories: Subcategory[] })[]) ?? []}
         brands={(brands as Brand[]) ?? []}
@@ -71,6 +72,7 @@ export default async function CollectionPage({ searchParams }: PageProps) {
         selectedSubcategory={searchParams.subcategory}
         selectedBrand={searchParams.brand}
       />
+      </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-baseline justify-between mb-8">
           <h1 className="font-serif text-3xl text-espresso">My Collection</h1>
