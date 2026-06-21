@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import ItemCard from '@/components/ItemCard'
-import { getItemLPScore } from '@/types'
-import type { LPReview } from '@/types'
+import { enrichItems, computeAvgScore } from '@/lib/items'
+import type { ItemWithRelations, LPReview } from '@/types'
 
 export default async function BrandPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -23,17 +23,16 @@ export default async function BrandPage({ params }: { params: { id: string } }) 
     .eq('status', 'owned')
     .order('created_at', { ascending: false })
 
-  const items = (rawItems ?? []).map(item => ({
-    ...item,
-    lp_score: getItemLPScore((item.reviews as LPReview[]) ?? []),
-    wear_count: (item.wear_records as { id: string }[])?.length ?? 0,
-  }))
+  const items = enrichItems(
+    (rawItems ?? []).map(item => ({
+      ...item,
+      lp_reviews: (item.reviews as LPReview[]) ?? [],
+      wear_records: (item.wear_records as { id: string }[]) ?? [],
+    }))
+  ) as ItemWithRelations[]
 
-  const scoredItems = items.filter(i => i.lp_score !== null)
-  const avgScore =
-    scoredItems.length > 0
-      ? (scoredItems.reduce((sum, i) => sum + (i.lp_score ?? 0), 0) / scoredItems.length).toFixed(1)
-      : null
+  const avgScoreStr = computeAvgScore(items)
+  const avgScore = avgScoreStr === '—' ? null : avgScoreStr
   const totalWears = items.reduce((sum, i) => sum + i.wear_count, 0)
 
   return (

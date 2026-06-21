@@ -3,8 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import HeroCarousel from '@/components/HeroCarousel'
 import DashboardStats from '@/components/DashboardStats'
 import ItemCard from '@/components/ItemCard'
-import { getItemLPScore } from '@/types'
-import type { HeroImage, LPReview } from '@/types'
+import { enrichItems, computeAvgScore } from '@/lib/items'
+import type { HeroImage, ItemWithRelations, LPReview } from '@/types'
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -12,7 +12,6 @@ export default async function HomePage() {
   const [
     { data: heroImages },
     { data: allItems },
-    { count: itemCount },
     { data: rawRecommendationItems },
   ] = await Promise.all([
     supabase.from('hero_images').select('*').order('display_order'),
@@ -21,7 +20,6 @@ export default async function HomePage() {
       .select('*, brand:brands(*), subcategory:subcategories(*, category:categories(*)), photos:item_photos(*), reviews:lp_reviews(*), wear_records:wear_records(id)')
       .eq('in_collection', true)
       .eq('status', 'owned'),
-    supabase.from('items').select('*', { count: 'exact', head: true }).eq('in_collection', true).eq('status', 'owned'),
     supabase
       .from('items')
       .select('*, brand:brands(*), subcategory:subcategories(*, category:categories(*)), photos:item_photos(*), reviews:lp_reviews(*), wear_records:wear_records(id)')
@@ -31,35 +29,37 @@ export default async function HomePage() {
       .limit(3),
   ])
 
-  const items = (allItems ?? []).map(item => ({
-    ...item,
-    lp_score: getItemLPScore((item.reviews as LPReview[]) ?? []),
-    wear_count: (item.wear_records as { id: string }[])?.length ?? 0,
-  }))
+  const items = enrichItems(
+    (allItems ?? []).map(item => ({
+      ...item,
+      lp_reviews: (item.reviews as LPReview[]) ?? [],
+      wear_records: (item.wear_records as { id: string }[]) ?? [],
+    }))
+  ) as ItemWithRelations[]
 
-  const recommendationItems = (rawRecommendationItems ?? []).map(item => ({
-    ...item,
-    lp_score: getItemLPScore((item.reviews as LPReview[]) ?? []),
-    wear_count: (item.wear_records as { id: string }[])?.length ?? 0,
-  }))
+  const recommendationItems = enrichItems(
+    (rawRecommendationItems ?? []).map(item => ({
+      ...item,
+      lp_reviews: (item.reviews as LPReview[]) ?? [],
+      wear_records: (item.wear_records as { id: string }[]) ?? [],
+    }))
+  ) as ItemWithRelations[]
 
-  const scoredItems = items.filter(i => i.lp_score !== null)
-  const avgScore =
-    scoredItems.length > 0
-      ? (scoredItems.reduce((sum, i) => sum + (i.lp_score ?? 0), 0) / scoredItems.length).toFixed(1)
-      : '—'
-
+  const avgScore = computeAvgScore(items)
   const totalValue = items.reduce((sum, i) => sum + (i.purchase_price ?? 0), 0)
-  const mostWorn = [...items].sort((a, b) => b.wear_count - a.wear_count).slice(0, 3)
+  const mostWorn = items.reduce(
+    (best, item) => (item.wear_count > (best?.wear_count ?? -1) ? item : best),
+    items[0] ?? null
+  )
   const recentItems = [...items]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 6)
 
   const stats = [
-    { label: 'Items', value: itemCount ?? 0 },
+    { label: 'Items', value: items.length },
     { label: 'Collection Value', value: totalValue > 0 ? `$${totalValue.toLocaleString()}` : '—' },
     { label: 'Avg LP Score', value: avgScore },
-    { label: 'Most Worn', value: mostWorn[0]?.name ?? '—' },
+    { label: 'Most Worn', value: mostWorn?.name ?? '—' },
   ]
 
   return (

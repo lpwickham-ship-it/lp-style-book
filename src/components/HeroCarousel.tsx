@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import type { HeroImage } from '@/types'
+import { getPhotoUrl } from '@/lib/supabase/storage'
 
 export default function HeroCarousel({ images }: { images: HeroImage[] }) {
   const [current, setCurrent] = useState(0)
@@ -23,7 +24,7 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
   }
 
   const active = images[current]
-  const photoUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/item-photos/${active.storage_path}`
+  const photoUrl = getPhotoUrl(active.storage_path)
 
   return (
     <div className="w-full aspect-[16/7] relative overflow-hidden">
@@ -37,23 +38,20 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
       />
       <div className="absolute inset-0 bg-espresso/20" />
 
-      {/* Dot navigation */}
-      {images.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
-          {images.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`w-2 h-2 rounded-full transition-opacity ${i === current ? 'bg-cream opacity-100' : 'bg-cream opacity-40'}`}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* Left/right arrows */}
       {images.length > 1 && (
         <>
+          {/* Dot navigation */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+            {images.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrent(i)}
+                className={`w-2 h-2 rounded-full transition-opacity ${i === current ? 'bg-cream opacity-100' : 'bg-cream opacity-40'}`}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+          {/* Left arrow */}
           <button
             onClick={() => setCurrent(i => (i - 1 + images.length) % images.length)}
             className="absolute left-4 top-1/2 -translate-y-1/2 bg-espresso/30 hover:bg-espresso/50 text-cream w-9 h-9 rounded-full flex items-center justify-center transition-colors"
@@ -61,6 +59,7 @@ export default function HeroCarousel({ images }: { images: HeroImage[] }) {
           >
             &#8592;
           </button>
+          {/* Right arrow */}
           <button
             onClick={() => setCurrent(i => (i + 1) % images.length)}
             className="absolute right-4 top-1/2 -translate-y-1/2 bg-espresso/30 hover:bg-espresso/50 text-cream w-9 h-9 rounded-full flex items-center justify-center transition-colors"

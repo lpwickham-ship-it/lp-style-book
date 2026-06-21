@@ -2,12 +2,11 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import type { ItemWithRelations } from '@/types'
+import { getPhotoUrl } from '@/lib/supabase/storage'
 
 export default function ItemCard({ item }: { item: ItemWithRelations }) {
   const primaryPhoto = item.photos.find(p => p.is_primary) ?? item.photos[0]
-  const photoUrl = primaryPhoto
-    ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/item-photos/${primaryPhoto.storage_path}`
-    : null
+  const photoUrl = primaryPhoto ? getPhotoUrl(primaryPhoto.storage_path) : null
 
   return (
     <Link href={`/items/${item.id}`} className="group block">

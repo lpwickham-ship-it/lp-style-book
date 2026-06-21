@@ -2,8 +2,8 @@
 import { createClient } from '@/lib/supabase/server'
 import CategorySidebar from '@/components/CategorySidebar'
 import ItemCard from '@/components/ItemCard'
-import { getItemLPScore } from '@/types'
-import type { Category, Subcategory, Brand, LPReview } from '@/types'
+import { enrichItems } from '@/lib/items'
+import type { Category, Subcategory, Brand, ItemWithRelations, LPReview } from '@/types'
 
 type PageProps = {
   searchParams: { category?: string; subcategory?: string; brand?: string }
@@ -32,40 +32,35 @@ export default async function CollectionPage({ searchParams }: PageProps) {
     .order('created_at', { ascending: false })
 
   if (searchParams.subcategory) {
-    const { data: sub } = await supabase
-      .from('subcategories')
-      .select('id')
-      .eq('slug', searchParams.subcategory)
-      .single()
+    const allSubcategories = (categories ?? []).flatMap(
+      c => (c as Category & { subcategories: Subcategory[] }).subcategories
+    )
+    const sub = allSubcategories.find(s => s.slug === searchParams.subcategory)
     if (sub) itemQuery = itemQuery.eq('subcategory_id', sub.id)
   } else if (searchParams.category) {
-    const { data: cat } = await supabase
-      .from('categories')
-      .select('id, subcategories(id)')
-      .eq('slug', searchParams.category)
-      .single()
+    const cat = (categories ?? []).find(
+      (c: Category & { subcategories: Subcategory[] }) => c.slug === searchParams.category
+    ) as (Category & { subcategories: Subcategory[] }) | undefined
     if (cat && cat.subcategories.length > 0) {
-      const subIds = (cat.subcategories as { id: string }[]).map(s => s.id)
+      const subIds = cat.subcategories.map(s => s.id)
       itemQuery = itemQuery.in('subcategory_id', subIds)
     }
   }
 
   if (searchParams.brand) {
-    const { data: brand } = await supabase
-      .from('brands')
-      .select('id')
-      .eq('name', searchParams.brand)
-      .single()
+    const brand = (brands ?? []).find(b => b.name === searchParams.brand)
     if (brand) itemQuery = itemQuery.eq('brand_id', brand.id)
   }
 
   const { data: rawItems } = await itemQuery
 
-  const items = (rawItems ?? []).map(item => ({
-    ...item,
-    lp_score: getItemLPScore((item.reviews as LPReview[]) ?? []),
-    wear_count: (item.wear_records as { id: string }[])?.length ?? 0,
-  }))
+  const items = enrichItems(
+    (rawItems ?? []).map(item => ({
+      ...item,
+      lp_reviews: (item.reviews as LPReview[]) ?? [],
+      wear_records: (item.wear_records as { id: string }[]) ?? [],
+    }))
+  ) as ItemWithRelations[]
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10 flex gap-10">

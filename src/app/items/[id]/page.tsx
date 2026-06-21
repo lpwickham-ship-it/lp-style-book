@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import LPScore from '@/components/LPScore'
 import { getItemLPScore } from '@/types'
 import type { LPReview, WearRecord } from '@/types'
+import { getPhotoUrl } from '@/lib/supabase/storage'
 
 export default async function ItemPage({ params }: { params: { id: string } }) {
   const supabase = await createClient()
@@ -39,9 +40,16 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
   )[0]
 
   const primaryPhoto = item.photos.find((p: { is_primary: boolean }) => p.is_primary) ?? item.photos[0]
-  const photoUrl = primaryPhoto
-    ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/item-photos/${primaryPhoto.storage_path}`
-    : null
+  const photoUrl = primaryPhoto ? getPhotoUrl(primaryPhoto.storage_path) : null
+
+  const lastWorn =
+    wearRecords.length > 0
+      ? new Date(
+          [...wearRecords].sort(
+            (a, b) => new Date(b.worn_on).getTime() - new Date(a.worn_on).getTime()
+          )[0].worn_on
+        ).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
+      : null
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-10">
@@ -94,14 +102,9 @@ export default async function ItemPage({ params }: { params: { id: string } }) {
                 ? 'Not yet worn'
                 : `Worn ${wearRecords.length} time${wearRecords.length === 1 ? '' : 's'}`}
             </p>
-            {wearRecords.length > 0 && (
+            {lastWorn && (
               <p className="text-xs text-warm mt-1">
-                Last worn:{' '}
-                {new Date(
-                  [...wearRecords].sort(
-                    (a, b) => new Date(b.worn_on).getTime() - new Date(a.worn_on).getTime()
-                  )[0].worn_on
-                ).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                Last worn: {lastWorn}
               </p>
             )}
           </div>
