@@ -3,10 +3,11 @@ import { createClient } from '@/lib/supabase/server'
 import CategorySidebar from '@/components/CategorySidebar'
 import ItemCard from '@/components/ItemCard'
 import { enrichItems } from '@/lib/items'
+import SortBar from '@/components/SortBar'
 import type { Category, Subcategory, Brand, ItemWithRelations, LPReview } from '@/types'
 
 type PageProps = {
-  searchParams: { category?: string; subcategory?: string; brand?: string }
+  searchParams: { category?: string; subcategory?: string; brand?: string; sort?: string }
 }
 
 export default async function CollectionPage({ searchParams }: PageProps) {
@@ -62,6 +63,15 @@ export default async function CollectionPage({ searchParams }: PageProps) {
     }))
   ) as ItemWithRelations[]
 
+  const sort = searchParams.sort ?? 'newest'
+  const sorted = [...items].sort((a, b) => {
+    if (sort === 'score') return (b.lp_score ?? -1) - (a.lp_score ?? -1)
+    if (sort === 'worn') return (b.wear_count ?? 0) - (a.wear_count ?? 0)
+    if (sort === 'price-desc') return (b.purchase_price ?? 0) - (a.purchase_price ?? 0)
+    if (sort === 'price-asc') return (a.purchase_price ?? 0) - (b.purchase_price ?? 0)
+    return 0 // newest: already ordered by DB
+  })
+
   return (
     <div className="max-w-6xl mx-auto px-6 py-10 flex gap-10 items-start">
       <div className="sticky top-6 self-start overflow-y-auto max-h-[calc(100vh-3rem)] shrink-0">
@@ -74,15 +84,18 @@ export default async function CollectionPage({ searchParams }: PageProps) {
       />
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-baseline justify-between mb-8">
+        <div className="flex items-baseline justify-between mb-4">
           <h1 className="font-serif text-3xl text-espresso">My Collection</h1>
           <span className="text-warm text-sm">{items.length} items</span>
         </div>
-        {items.length === 0 ? (
+        <div className="mb-8">
+          <SortBar current={sort} />
+        </div>
+        {sorted.length === 0 ? (
           <p className="text-warm text-sm">No items found.</p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 gap-x-6 gap-y-10">
-            {items.map(item => (
+            {sorted.map(item => (
               <ItemCard key={item.id} item={item} />
             ))}
           </div>
