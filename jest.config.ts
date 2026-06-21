@@ -7,6 +7,9 @@ const createJestConfig = nextJest({ dir: './' })
 const config: Config = {
   coverageProvider: 'v8',
   testEnvironment: 'jsdom',
+  moduleNameMapper: {
+    '^cheerio/slim$': '<rootDir>/node_modules/cheerio/dist/commonjs/slim.js',
+  },
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 }
 
