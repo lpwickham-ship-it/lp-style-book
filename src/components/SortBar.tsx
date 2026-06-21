@@ -29,21 +29,17 @@ export default function SortBar({ current }: { current?: string }) {
   }
 
   return (
-    <div className="flex items-center gap-1 flex-wrap">
-      <span className="text-warm text-xs tracking-widest uppercase mr-2">Sort</span>
-      {SORT_OPTIONS.map(opt => (
-        <button
-          key={opt.value}
-          onClick={() => setSort(opt.value)}
-          className={`text-xs px-3 py-1.5 tracking-wide transition-colors ${
-            active === opt.value
-              ? 'bg-espresso text-cream'
-              : 'text-warm hover:text-espresso border border-espresso/20 hover:border-espresso/40'
-          }`}
-        >
-          {opt.label}
-        </button>
-      ))}
+    <div className="flex items-center gap-3">
+      <span className="text-warm text-xs tracking-widest uppercase">Sort by</span>
+      <select
+        value={active}
+        onChange={e => setSort(e.target.value as SortValue)}
+        className="text-xs text-espresso bg-cream border border-espresso/20 px-3 py-1.5 tracking-wide focus:outline-none focus:border-espresso/60 cursor-pointer"
+      >
+        {SORT_OPTIONS.map(opt => (
+          <option key={opt.value} value={opt.value}>{opt.label}</option>
+        ))}
+      </select>
     </div>
   )
 }
